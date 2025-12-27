@@ -44,6 +44,12 @@ public class SecurityConfig {
                                 "/categories", "/categories/**",
                                 "/reviews", "/reviews/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority("ROLE_ADMIN","ROLE_SELLER")
+                        .requestMatchers(HttpMethod.PUT,  "/products/**").hasAnyAuthority("ROLE_ADMIN","ROLE_SELLER")
+                        .requestMatchers(HttpMethod.DELETE,"/products/**").hasAnyAuthority("ROLE_ADMIN","ROLE_SELLER")
+
+
                         .requestMatchers("/order-items/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/orders/**", "/users/**").authenticated()
                 .anyRequest().authenticated()
