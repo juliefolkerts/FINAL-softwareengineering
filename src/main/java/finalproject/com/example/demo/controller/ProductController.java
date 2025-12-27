@@ -20,50 +20,49 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // Public
     @GetMapping
-    @PreAuthorize("permitAll()")
     public ResponseEntity<List<ProductResponse>> getAll() {
         return ResponseEntity.ok(productService.findAll());
     }
 
+    // Public
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ProductResponse> getById(@PathVariable Long id) {
         return productService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Admin or Seller
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> create(@RequestBody ProductRequest request) {
-        try {
-            ProductResponse created = productService.create(request);
-            return ResponseEntity.created(URI.create("/products/" + created.getId())).body(created);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SELLER')")
+    public ResponseEntity<ProductResponse> create(@RequestBody ProductRequest request) {
+        ProductResponse created = productService.create(request);
+        return ResponseEntity.created(URI.create("/products/" + created.getId())).body(created);
     }
 
+    // Admin or Seller
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ProductRequest request) {
-        try {
-            return productService.update(id, request)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SELLER')")
+    public ResponseEntity<ProductResponse> update(
+            @PathVariable Long id,
+            @RequestBody ProductRequest request
+    ) {
+        return productService.update(id, request)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Admin or Seller
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SELLER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
+
 
 
 

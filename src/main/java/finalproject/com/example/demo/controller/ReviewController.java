@@ -20,50 +20,49 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    // Public
     @GetMapping
-    @PreAuthorize("permitAll()")
     public ResponseEntity<List<ReviewResponse>> getAll() {
         return ResponseEntity.ok(reviewService.findAll());
     }
 
+    // Public
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ReviewResponse> getById(@PathVariable Long id) {
         return reviewService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Admin or User
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<?> create(@RequestBody ReviewRequest request) {
-        try {
-            ReviewResponse created = reviewService.create(request);
-            return ResponseEntity.created(URI.create("/reviews/" + created.getId())).body(created);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public ResponseEntity<ReviewResponse> create(@RequestBody ReviewRequest request) {
+        ReviewResponse created = reviewService.create(request);
+        return ResponseEntity.created(URI.create("/reviews/" + created.getId())).body(created);
     }
 
+    // Admin or User
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ReviewRequest request) {
-        try {
-            return reviewService.update(id, request)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public ResponseEntity<ReviewResponse> update(
+            @PathVariable Long id,
+            @RequestBody ReviewRequest request
+    ) {
+        return reviewService.update(id, request)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Admin or User
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         reviewService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
+
 
 
 
