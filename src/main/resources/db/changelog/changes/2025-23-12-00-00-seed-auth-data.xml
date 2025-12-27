@@ -20,7 +20,7 @@
 
         <insert tableName="t_users">
             <column name="email" value="julievmf@gmail.com"/>
-            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="password" value="$2b$12$HSFjQphD57AL9c1uMEqYruxL1bWZboLdtNeCkDOydjKeOlSCfm5Oq"/>
             <column name="full_name" value="Julie Folkerts"/>
             <column name="blocked" valueBoolean="false"/>
             <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>

@@ -15,5 +15,8 @@
              relativeToChangelogFile="true"/>
     <include file="changes/2025-23-12-02-00-seed-business-data.xml"
              relativeToChangelogFile="true"/>
+    <include file="changes/2025-12-27-update-admin-password.xml"
+             relativeToChangelogFile="true"/>
+
 
 </databaseChangeLog>

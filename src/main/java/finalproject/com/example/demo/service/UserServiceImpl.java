@@ -8,13 +8,16 @@ import finalproject.com.example.demo.entity.User;
 import finalproject.com.example.demo.mapper.UserMapper;
 import finalproject.com.example.demo.repository.RoleRepository;
 import finalproject.com.example.demo.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,22 +41,37 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    //*f
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username);
-        if (Objects.nonNull(user)) {
-            return user;
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
         }
-        throw new UsernameNotFoundException("User Not Found");
+
+        if (user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is blocked");
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRole())) // ROLE_ADMIN
+                        .toList()
+        );
     }
 
     @Override
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             Object principal = authentication.getPrincipal();
-            if (principal instanceof User) {
-                return (User) principal;
+
+            if (principal instanceof org.springframework.security.core.userdetails.User springUser) {
+                return userRepository.findByEmail(springUser.getUsername());
             }
         }
         return null;
@@ -89,9 +107,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean register(String email, String password, String repeatPassword, String fullName) {
-        User existing = userRepository.findByEmail(email);
-
-        if (existing != null) {
+        if (userRepository.findByEmail(email) != null) {
             return null;
         }
 
@@ -101,7 +117,7 @@ public class UserServiceImpl implements UserService {
 
         Role userRole = roleRepository.findByRole("ROLE_USER");
         if (userRole == null) {
-            throw new IllegalStateException("ROLE_USER not found. Roles must be seeded first.");
+            throw new IllegalStateException("ROLE_USER not found.");
         }
 
         User newUser = new User();
@@ -118,32 +134,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(String oldPassword, String newPassword, String repeatNewPassword) {
-        User currentUser = getCurrentUser();
-        if (currentUser == null) {
+        User current = getCurrentUser();
+        if (current == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
         }
 
-        if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is mismatching!");
+        if (!passwordEncoder.matches(oldPassword, current.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password mismatch");
         }
 
         if (!newPassword.equals(repeatNewPassword)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New passwords are mismatching!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords mismatch");
         }
 
-        currentUser.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(currentUser);
+        current.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(current);
     }
 
     @Override
     public UserResponse createUser(AdminCreateUserRequest request) {
         if (userRepository.findByEmail(request.getEmail()) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is occupied!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email occupied");
         }
 
         Role role = roleRepository.findByRole(request.getRole());
         if (role == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found: " + request.getRole());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found");
         }
 
         User user = userMapper.toEntity(request);
@@ -156,16 +172,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void blockUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setBlocked(true);
         userRepository.save(user);
     }
 
     @Override
     public void unblockUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setBlocked(false);
         userRepository.save(user);
     }
@@ -177,7 +193,23 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
     }
+
+    @PostConstruct
+    public void printHash() {
+        System.out.println(
+                new BCryptPasswordEncoder().encode("Admin123!")
+        );
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
+
 }
+
 
 
 

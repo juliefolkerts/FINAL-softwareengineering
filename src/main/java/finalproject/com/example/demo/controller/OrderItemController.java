@@ -20,50 +20,54 @@ public class OrderItemController {
         this.orderItemService = orderItemService;
     }
 
+    // ADMIN only
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<OrderItemResponse>> getAll() {
         return ResponseEntity.ok(orderItemService.findAll());
     }
 
+    // ADMIN only
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<OrderItemResponse> getById(@PathVariable Long id) {
         return orderItemService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ADMIN only
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody OrderItemRequest request) {
-        try {
-            OrderItemResponse created = orderItemService.create(request);
-            return ResponseEntity.created(URI.create("/order-items/" + created.getId())).body(created);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<OrderItemResponse> create(@RequestBody OrderItemRequest request) {
+        OrderItemResponse created = orderItemService.create(request);
+        return ResponseEntity
+                .created(URI.create("/order-items/" + created.getId()))
+                .body(created);
     }
 
+    // ADMIN only
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody OrderItemRequest request) {
-        try {
-            return orderItemService.update(id, request)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<OrderItemResponse> update(
+            @PathVariable Long id,
+            @RequestBody OrderItemRequest request
+    ) {
+        return orderItemService.update(id, request)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ADMIN only
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderItemService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
+
+
 
 
 
