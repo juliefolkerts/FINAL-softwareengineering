@@ -7,10 +7,11 @@
           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd">
 
 
-<include file="changes/2025-23-12-00-00-create-auth-tables.xml"
+    <include file="changes/2025-23-12-00-00-create-auth-tables.xml"
              relativeToChangelogFile="true"/>
-
     <include file="changes/2025-23-12-00-00-seed-auth-data.xml"
+             relativeToChangelogFile="true"/>
+    <include file="changes/2025-23-12-01-00-create-business-tables.xml"
              relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
