@@ -7,6 +7,7 @@
           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd">
 
     <changeSet id="2025-23-12-02-00-seed-business-data" author="jvm">
+        <comment>All demo users (seller and buyers) use password 'DemoPass123!' stored as bcrypt.</comment>
         <insert tableName="t_categories">
             <column name="id" valueNumeric="1"/>
             <column name="name" value="Electronics"/>
@@ -20,7 +21,7 @@
         <insert tableName="t_categories">
             <column name="id" valueNumeric="3"/>
             <column name="name" value="Books"/>
-            <column name="description" value="Print and digital reads"/>
+            <column name="description" value="Print and digital reads across technology and fiction."/>
         </insert>
         <insert tableName="t_categories">
             <column name="id" valueNumeric="4"/>
@@ -31,7 +32,7 @@
         <insert tableName="t_users">
             <column name="id" valueNumeric="2"/>
             <column name="email" value="sophia.seller@example.com"/>
-            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="password" value="$2b$12$HSFjQphD57AL9c1uMEqYruxL1bWZboLdtNeCkDOydjKeOlSCfm5Oq"/>
             <column name="full_name" value="Sophia Rivera"/>
             <column name="blocked" valueBoolean="false"/>
             <column name="created_at" valueDate="2024-11-20 10:00:00"/>
@@ -39,7 +40,7 @@
         <insert tableName="t_users">
             <column name="id" valueNumeric="3"/>
             <column name="email" value="liam.buyer@example.com"/>
-            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="password" value="$2b$12$HSFjQphD57AL9c1uMEqYruxL1bWZboLdtNeCkDOydjKeOlSCfm5Oq"/>
             <column name="full_name" value="Liam Chen"/>
             <column name="blocked" valueBoolean="false"/>
             <column name="created_at" valueDate="2024-11-22 14:30:00"/>
@@ -47,7 +48,7 @@
         <insert tableName="t_users">
             <column name="id" valueNumeric="4"/>
             <column name="email" value="amelia.buyer@example.com"/>
-            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="password" value="$2b$12$HSFjQphD57AL9c1uMEqYruxL1bWZboLdtNeCkDOydjKeOlSCfm5Oq"/>
             <column name="full_name" value="Amelia Patel"/>
             <column name="blocked" valueBoolean="false"/>
             <column name="created_at" valueDate="2024-11-23 09:45:00"/>
