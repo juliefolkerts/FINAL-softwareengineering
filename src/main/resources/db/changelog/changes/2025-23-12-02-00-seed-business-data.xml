@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd">
+
+    <changeSet id="2025-23-12-02-00-seed-business-data" author="jvm">
+        <insert tableName="t_categories">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Electronics"/>
+            <column name="description" value="Headphones, smart devices, and accessories."/>
+        </insert>
+        <insert tableName="t_categories">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Home &amp; Kitchen"/>
+            <column name="description" value="Coffee makers, cookware, and home comfort picks."/>
+        </insert>
+        <insert tableName="t_categories">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Books"/>
+            <column name="description" value="Print and digital reads"/>
+        </insert>
+        <insert tableName="t_categories">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Sports &amp; Outdoors"/>
+            <column name="description" value="Running, hiking, and outdoor adventure gear."/>
+        </insert>
+
+        <insert tableName="t_users">
+            <column name="id" valueNumeric="2"/>
+            <column name="email" value="sophia.seller@example.com"/>
+            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="full_name" value="Sophia Rivera"/>
+            <column name="blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="2024-11-20 10:00:00"/>
+        </insert>
+        <insert tableName="t_users">
+            <column name="id" valueNumeric="3"/>
+            <column name="email" value="liam.buyer@example.com"/>
+            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="full_name" value="Liam Chen"/>
+            <column name="blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="2024-11-22 14:30:00"/>
+        </insert>
+        <insert tableName="t_users">
+            <column name="id" valueNumeric="4"/>
+            <column name="email" value="amelia.buyer@example.com"/>
+            <column name="password" value="$2a$10$aZozoUhGvWkyEiLmmx9oa.ZP4j4z4UtrBE1ZQHelUWl4YSSQKaxLi"/>
+            <column name="full_name" value="Amelia Patel"/>
+            <column name="blocked" valueBoolean="false"/>
+            <column name="created_at" valueDate="2024-11-23 09:45:00"/>
+        </insert>
+
+        <sql stripComments="true">
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT 2, r.id FROM t_roles r WHERE r.role = 'ROLE_SELLER';
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT 2, r.id FROM t_roles r WHERE r.role = 'ROLE_USER';
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT 3, r.id FROM t_roles r WHERE r.role = 'ROLE_USER';
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT 4, r.id FROM t_roles r WHERE r.role = 'ROLE_USER';
+        </sql>
+
+        <sql stripComments="true">
+            INSERT INTO t_products (id, name, description, price, category_id, seller_id, status)
+            VALUES (
+                       1,
+                       'Aurora Noise-Cancelling Headphones',
+                       'Wireless over-ear headphones with adaptive noise control and 30-hour battery life.',
+                       199.99,
+                       (SELECT id FROM t_categories WHERE name = 'Electronics'),
+                       2,
+                       'ACTIVE'
+                   );
+
+            INSERT INTO t_products (id, name, description, price, category_id, seller_id, status)
+            VALUES (
+                       2,
+                       'Nordic Pour-Over Coffee Maker',
+                       'Stainless steel pour-over brewer with dual filters and a heat-proof carafe.',
+                       89.50,
+                       (SELECT id FROM t_categories WHERE name = 'Home &amp; Kitchen'),
+                       2,
+                       'ACTIVE'
+                   );
+
+            INSERT INTO t_products (id, name, description, price, category_id, seller_id, status)
+            VALUES (
+                       3,
+                       'Trailblazer Running Shoes',
+                       'Lightweight road-to-trail shoes with breathable mesh and responsive cushioning.',
+                       129.00,
+                       (SELECT id FROM t_categories WHERE name = 'Sports &amp; Outdoors'),
+                       2,
+                       'ACTIVE'
+                   );
+
+            INSERT INTO t_products (id, name, description, price, category_id, seller_id, status)
+            VALUES (
+                       4,
+                       'Modern Data Pipelines',
+                       'A practical guide to designing resilient ETL/ELT workflows with real-world case studies.',
+                       54.95,
+                       (SELECT id FROM t_categories WHERE name = 'Books'),
+                       2,
+                       'ACTIVE'
+                   );
+        </sql>
+
+        <sql stripComments="true">
+            INSERT INTO t_orders (id, user_id, status, total_price, created_at)
+            VALUES (1, 3, 'PAID', 289.49, '2025-01-05 09:15:00');
+            INSERT INTO t_orders (id, user_id, status, total_price, created_at)
+            VALUES (2, 4, 'PROCESSING', 183.95, '2025-01-06 16:45:00');
+        </sql>
+
+        <sql stripComments="true">
+            INSERT INTO t_order_items (id, order_id, product_id, quantity, price_at_purchase)
+            VALUES (1, 1, 1, 1, 199.99);
+            INSERT INTO t_order_items (id, order_id, product_id, quantity, price_at_purchase)
+            VALUES (2, 1, 2, 1, 89.50);
+            INSERT INTO t_order_items (id, order_id, product_id, quantity, price_at_purchase)
+            VALUES (3, 2, 3, 1, 129.00);
+            INSERT INTO t_order_items (id, order_id, product_id, quantity, price_at_purchase)
+            VALUES (4, 2, 4, 1, 54.95);
+        </sql>
+
+        <sql stripComments="true">
+            INSERT INTO t_reviews (id, user_id, product_id, rating, comment)
+            VALUES (1, 3, 1, 5, 'Great noise cancellation and the fit is comfortable for long calls.');
+            INSERT INTO t_reviews (id, user_id, product_id, rating, comment)
+            VALUES (2, 4, 3, 4, 'Grip is solid on wet pavement and sizing is true to fit.');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
