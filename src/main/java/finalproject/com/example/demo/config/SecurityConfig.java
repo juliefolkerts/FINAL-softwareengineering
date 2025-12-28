@@ -61,7 +61,8 @@ public class SecurityConfig {
 
                 // ORDER ITEMS
                 .requestMatchers(HttpMethod.GET, "/order-items/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers(HttpMethod.POST, "/order-items", "/order-items/**").hasAuthority("ROLE_ADMIN")
+                //.requestMatchers(HttpMethod.POST, "/order-items", "/order-items/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers(HttpMethod.POST, "/order-items", "/order-items/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/order-items", "/order-items/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/order-items", "/order-items/**").hasAuthority("ROLE_ADMIN")
 
