@@ -41,6 +41,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Override
+    public List<UserResponse> findAllUsers() {
+        return userMapper.toResponse(userRepository.findAll());
+    }
+
     //*f
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

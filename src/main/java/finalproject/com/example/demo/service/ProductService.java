@@ -10,6 +10,8 @@ public interface ProductService {
 
     List<ProductResponse> findAll();
 
+
+
     Optional<ProductResponse> findById(Long id);
 
     ProductResponse create(ProductRequest request);
