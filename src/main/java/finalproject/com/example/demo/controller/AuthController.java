@@ -69,7 +69,6 @@ public class AuthController {
                     .body("Invalid credentials");
         }
 
-        // ✅ CORRECT: fetch user directly by email
         User user = userService.getUserByEmail(req.getEmail());
         if (user == null) {
             return ResponseEntity
